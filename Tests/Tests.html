@@ -1,0 +1,204 @@
+<html>
+<body>
+
+<div id="divUi">
+
+	<h3>Tests - Java Bytecode Assembler/Disassembler</h3>
+
+</div>
+
+<script type="text/javascript" src="../Source/ByteHelper.js"></script>
+<script type="text/javascript" src="../Source/ByteStreamFromBytes.js"></script>
+<script type="text/javascript" src="../Source/Instruction.js"></script>
+<script type="text/javascript" src="../Source/JavaBytecodeAssemblerDisassembler.js"></script>
+<script type="text/javascript" src="../Source/Opcode.js"></script>
+<script type="text/javascript" src="../Source/Operand.js"></script>
+<script type="text/javascript" src="../Source/OperandDefn.js"></script>
+<script type="text/javascript" src="../Source/Program.js"></script>
+<script type="text/javascript" src="../Source/Runtime.js"></script>
+
+<script type="text/javascript">
+
+class Assert
+{
+	static areEqual(value1, value2)
+	{
+		if (value1 != value2)
+		{
+			var message =
+				"Expected equal, but were not equal: '"
+				+ value1 + "', '" + value2 + "'.";
+			throw new Error(message);
+		}
+	}
+
+	static areStringsEqual(string1, string2)
+	{
+		if (string1 != string2)
+		{
+			for (var i = 0; i < string1.length; i++)
+			{
+				var charFromString1 = string1[i];
+				var charFromString2 = string2[i];
+
+				if (charFromString1 != charFromString2)
+				{
+					var message =
+						"Expected equal, but were not equal, starting at index: "
+						+ i;
+					throw new Error(message);
+				}
+			}
+
+		}
+	}
+
+	static isTrue(booleanToCheck)
+	{
+		if (booleanToCheck != true)
+		{
+			throw new Error("Expected true, but was: " + booleanToCheck);
+		}
+	}
+}
+
+class Test
+{
+	constructor(name, run)
+	{
+		this.name = name;
+		this._run = run;
+	}
+
+	run()
+	{
+		var message = "Test '" + this.name + "' ";
+		try
+		{
+			this._run();
+			message += "passed.";
+		}
+		catch (err)
+		{
+			message += ("failed with error: " + err + " " + err.stack);
+		}
+
+		message += "<br />";
+
+		document.write(message); 
+	}
+}
+
+class TestFixture
+{
+	constructor(name, tests)
+	{
+		this.name = name;
+		this.tests = tests;
+	}
+
+	run()
+	{
+		this.tests.forEach(x => x.run() );
+	}
+}
+
+class TestSuite
+{
+	constructor(fixtures)
+	{
+		this.fixtures = fixtures;
+	}
+
+	run()
+	{
+		this.fixtures.forEach(x => x.run());
+	}
+}
+
+var testAssembleThenDisassembleAllOpcodes = new Test
+(
+	"AssembleThenDisassembleAllOpcodes",
+	() =>
+	{
+		var opcodes = Opcode.Instances()._All;
+
+		var instructions = [];
+		for (var i = 0; i < opcodes.length; i++)
+		{
+			var opcode = opcodes[i];
+
+			var operands = opcode.operandDefns.map
+			(
+				x => new Operand(x.name, 0)
+			);
+
+			var instruction = new Instruction(opcode, operands);
+			instructions.push(instruction);
+		}
+
+		var program = new Program(instructions);
+
+		var programAsCodeBeforeAssembly = program.toCode();
+
+		var assembler = new JavaBytecodeAssemblerDisassembler();
+		var programAsBytes =
+			assembler.assembleCode(programAsCodeBeforeAssembly);
+		var programAsCodeDisassembled =
+			assembler.disassembleBytes(programAsBytes);
+
+		Assert.areStringsEqual
+		(
+			programAsCodeBeforeAssembly, programAsCodeDisassembled
+		);
+		
+	}
+);
+
+var testExecuteAllOpcodes = new Test
+(
+	"ExecuteAllOpcodes",
+	() =>
+	{
+		var opcodes = Opcode.Instances()._All;
+
+		var instructions = [];
+		for (var i = 0; i < opcodes.length; i++)
+		{
+			var opcode = opcodes[i];
+
+			var operands = opcode.operandDefns.map
+			(
+				x => new Operand(x.name, 0)
+			);
+
+			var instruction = new Instruction(opcode, operands);
+			instructions.push(instruction);
+		}
+
+		var program = new Program(instructions);
+
+		var runtime = new Runtime();
+
+		program.executeAgainstRuntime(runtime);
+	}
+);
+
+
+var testFixture = new TestFixture
+(
+	"AllTests",
+	[
+		testAssembleThenDisassembleAllOpcodes,
+		testExecuteAllOpcodes
+	]
+);
+
+var testSuite = new TestSuite( [ testFixture ] );
+
+testSuite.run();
+
+</script>
+
+</body>
+</html>

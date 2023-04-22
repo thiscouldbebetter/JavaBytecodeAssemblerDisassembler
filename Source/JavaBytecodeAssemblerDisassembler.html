@@ -1,0 +1,47 @@
+<html>
+<body>
+
+<div id="divUi">
+
+	<h3>Java Bytecode Assembler/Disassembler</h3>
+
+	<p>
+		Enter valid Java bytecode in the box
+		and click the Assemble button to assemble it into bytes.
+		Then click the Disassemble button
+		to convert the bytes back to bytecode.
+	</p>
+
+	<div>
+		<label>Program as Java Bytecode:</label>
+		<br />
+		<textarea id="textareaCode" cols="40" rows="16"></textarea>
+	</div>
+
+	<div>
+		<button onclick="UiEventHandler.buttonAssemble_Clicked()">v Assemble v</button>
+		<button onclick="UiEventHandler.buttonDisassemble_Clicked()">^ Disassemble ^</button>
+	</div>
+
+	<div>
+		<label>Program as Bytes:</label>
+		<br />
+		<textarea id="textareaBytesAsHexadecimal" cols="40" rows="16"></textarea>
+	</div>
+
+
+</div>
+
+<script type="text/javascript" src="ByteHelper.js"></script>
+<script type="text/javascript" src="ByteStreamFromBytes.js"></script>
+<script type="text/javascript" src="Instruction.js"></script>
+<script type="text/javascript" src="JavaBytecodeAssemblerDisassembler.js"></script>
+<script type="text/javascript" src="Opcode.js"></script>
+<script type="text/javascript" src="Operand.js"></script>
+<script type="text/javascript" src="OperandDefn.js"></script>
+<script type="text/javascript" src="Program.js"></script>
+<script type="text/javascript" src="Runtime.js"></script>
+<script type="text/javascript" src="UiEventHandler.js"></script>
+
+</body>
+</html>
